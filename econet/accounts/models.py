@@ -2,10 +2,10 @@ from django.db import models
 
 class User(models.Model):    # 사용자 정보 정의
     user_id_number = models.AutoField(unique=True, primary_key=True)   # 유저 id(숫자)
-    nickname = models.CharField(min_length=2, max_length=20, unique=True, error_messages={'unique': '이미 사용중인 별명입니다'})    # 유저 닉네임
+    nickname = models.CharField(max_length=20, unique=True, error_messages={'unique': '이미 사용중인 별명입니다'})    # 유저 닉네임
     introduction = models.TextField(max_length=150, blank=True) # 유저 소개말
     joined_groups = models.ManyToManyField('Group', related_name='members', blank=True) # User 모델과 Group 모델 간의 다대다 관계 정의
-    password = models.CharField(min_length=8, max_length=20)
+    password = models.CharField(max_length=20)
     signup_date = models.DateTimeField(auto_now_add=True)   # 계정 생성 일자
     tier_choices = [
     #   ('DB 제공 값', '사용자 제공 값')
@@ -36,7 +36,7 @@ class User(models.Model):    # 사용자 정보 정의
 class Group(models.Model):
     group_id = models.AutoField(primary_key=True)  # 모임 id
     board_id = models.CharField(max_length=50)  # 게시판 id
-    name = models.CharField(min_length=2, max_length=30)  # 모임 이름
+    name = models.CharField(max_length=30)  # 모임 이름
     introduction = models.TextField(max_length=300)  # 모임 소개글
     members_count = models.IntegerField(default=0)  # 유저 수
     chat_link = models.URLField(blank=True)  # 모임톡방 링크
