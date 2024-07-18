@@ -1,0 +1,14 @@
+<!-- templates/location/location_detail.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Location Detail</title>
+</head>
+<body>
+    <h1>{{ collection_bin.user_location }}의 수거함</h1>
+    <img src="{{ collection_bin.photo.url }}" alt="수거함 사진">
+    <p>{{ collection_bin.description }}</p>
+    <p><strong>수거 대상 품목:</strong> {{ collection_bin.acceptable_items }}</p>
+    <p><strong>수거 불가 품목:</strong> {{ collection_bin.unacceptable_items }}</p>
+</body>
+</html>
