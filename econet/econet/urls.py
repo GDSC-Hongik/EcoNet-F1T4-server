@@ -21,8 +21,8 @@ urlpatterns = [
 #    path('', include()),  //메인페이지로 연결
     path('accounts/', include('accounts.urls')),
     path('board/', include('board.urls')),
-    path('today/', include('today.urls')),
-    path('article/', include('article.urls')),
-    path('location/', include('location.urls')),
+#    path('today/', include('today.urls')),
+#    path('article/', include('article.urls')),
+#    path('location/', include('location.urls')),
 
 ]
