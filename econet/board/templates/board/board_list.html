@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>게시판 리스트</title>
+</head>
+<body>
+    <h1>게시판 리스트</h1>
+    <ul>
+        {% for board in boards %}
+            <li>
+                <a href="{% url 'board_list' %}">{{ board.name }}</a>
+            </li>
+        {% empty %}
+            <li>등록된 게시판이 없습니다.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
