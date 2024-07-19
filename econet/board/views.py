@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .forms import PostForm
 from .models import Board, Post
+from datetime import datetime
 
 # Create your views here.
 
@@ -25,6 +26,7 @@ def create_post(request, board_id):
             post = form.save(commit=False)
             post.board = board  # 폼을 통해 받은 게시글에 게시판 설정
             post.user_id = request.user  # 현재 로그인된 사용자 설정
+            post.created_dt = datetime.now() #현재 시각 저장
             post.save()
             return redirect('board/post_detail', board_id=board.id, post_id=post.id) #작성한 게시글 상세 페이지로 리다이렉트
     else:
