@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ board.name }} - 게시글 목록</title>
+</head>
+<body>
+    <h1>{{ board.name }} 게시판</h1>
+    <ul>
+        {% for post in posts %}
+            <li>
+                <h2>{{ post.title }}</h2>
+                <p>{{ post.content|slice:":200" }}...</p>
+                <p>작성자: {{ post.user_id }} / 작성일: {{ post.created_dt }}</p>
+            </li>
+        {% empty %}
+            <li>게시글이 없습니다.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
