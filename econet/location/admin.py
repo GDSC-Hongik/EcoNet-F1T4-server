@@ -3,4 +3,4 @@ from .models import CollectionBin
 
 @admin.register(CollectionBin)
 class CollectionBoxAdmin(admin.ModelAdmin):
-    list_display = ('id', 'location_description')
+    list_display = ('bin_id_number', 'description')
