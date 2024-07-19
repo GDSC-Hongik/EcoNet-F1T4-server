@@ -1,0 +1,14 @@
+<!-- post_detail.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ post.title }}</title>
+</head>
+<body>
+    <h1>{{ post.title }}</h1>
+    <p>{{ post.content }}</p>
+    <p>Author: {{ post.author.username }}</p>  <!-- 작성자의 닉네임 또는 사용자 이름 -->
+    <p>Board: {{ post.board.name }}</p>  <!-- 게시판 이름 -->
+</body>
+</html>

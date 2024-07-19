@@ -9,7 +9,7 @@
     <ul>
         {% for board in boards %}
             <li>
-                <a href="{% url 'board_list' %}">{{ board.name }}</a>
+                <a href="{% url 'post_list' board.id %}">{{ board.name }}</a>
             </li>
         {% empty %}
             <li>등록된 게시판이 없습니다.</li>
