@@ -14,6 +14,7 @@ urlpatterns = [
     #게시글 상세 페이지
     path('<int:board_id>/<int:post_id>/', views.post_detail, name='post_detail'),
 
-    
+    #게시글 수정 페이지
+     path('<int:board_id>/<int:post_id>/edit/', views.edit_post, name='post_edit'),
 
 ]
