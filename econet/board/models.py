@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 # Create your models here.
 class Board(models.Model):
@@ -16,10 +17,11 @@ class Post(models.Model):
     post_id = models.AutoField(primary_key=True)
     title = models.IntegerField()
     content = models.CharField(max_length=300)
-    created_dt = models.DateTimeField(blank=True, null=True)
-    likes = models.IntegerField(blank=True, null=True)
-    board = models.ForeignKey(Board, models.DO_NOTHING, blank=True, null=True)
-    user_id = models.IntegerField(blank=True, null=True)
+    created_dt = models.DateTimeField()
+    likes = models.IntegerField()
+    board_id = models.ForeignKey(Board, models.DO_NOTHING)
+    user_id = models.ForeignKey(settings.AUTH_USER_MODEL, models.DO_NOTHING)
+    updated_dt = models.DateTimeField()
 
     class Meta:
         managed = False
@@ -30,9 +32,21 @@ class Post(models.Model):
 
 class Scrap(models.Model):
     scrap_id = models.AutoField(primary_key=True)
-    user_id = models.IntegerField(blank=True, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.DO_NOTHING)
     post = models.ForeignKey(Post, models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'Scrap'
+
+class Comment(models.Model):
+    comment_id = models.AutoField(primary_key=True)
+    post = models.ForeignKey('Post', models.DO_NOTHING)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.DO_NOTHING)
+    content = models.CharField(max_length=300)
+    likes = models.IntegerField()
+    created_dt = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'Comment'
