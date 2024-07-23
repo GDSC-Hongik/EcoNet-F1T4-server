@@ -1,0 +1,8 @@
+<h3>글쓰기</h3>
+<form method='POST'>
+    {%csrf_token%}
+    <table>
+        {{form.as_table}}
+    </table>
+    <input type="submit" value="글작성하기">
+</form>

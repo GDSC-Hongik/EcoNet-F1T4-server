@@ -9,6 +9,7 @@ urlpatterns = [
     path('<int:board_id>/', views.post_list, name='post_list'),
 
     #게시글 작성 페이지
+    path('<int:board_id>/new/', views.new, name='new'),
     path('<int:board_id>/create/', views.create_post, name='post_create'),
 
     #게시글 상세 페이지

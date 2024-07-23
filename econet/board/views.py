@@ -16,6 +16,10 @@ def post_list(request, board_id):
     posts = Post.objects.filter(board=board)
     return render(request, 'board/post_list.html', {'board': board, 'posts': posts})
 
+def new(request, board_id):
+    board = get_object_or_404(Board, id=board_id)
+    return render(request, 'new.html')
+
 
 def create_post(request, board_id):
     board = get_object_or_404(Board, id=board_id) # 게시판 객체 가져옴
@@ -31,7 +35,7 @@ def create_post(request, board_id):
             return redirect('board/post_detail', board_id=board.id, post_id=post.id) #작성한 게시글 상세 페이지로 리다이렉트
     else:
         form = PostForm()
-    return render(request, 'board/post_create.html', {'form': form, 'board': board})
+    return render(request, 'board/new.html', {'form': form, 'board': board})
 
 def post_detail(request, board_id, post_id):
     post = get_object_or_404(Post, id=post_id, board_id=board_id)
