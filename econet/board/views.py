@@ -55,3 +55,12 @@ def edit_post(request, board_id, post_id):
         form = PostForm(instance=post)
         # GET 요청이므로, 폼을 렌더링
         return render(request, 'board/edit_post.html', {'form': form, 'board': board, 'post': post})
+    
+def  delete_post(request, board_id, post_id):
+    board = get_object_or_404(Board, pk=board_id)
+    post = get_object_or_404(Post, pk=post_id, board=board)
+    post.delete()
+    return redirect('post_list')
+
+
+

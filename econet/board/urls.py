@@ -15,6 +15,11 @@ urlpatterns = [
     path('<int:board_id>/<int:post_id>/', views.post_detail, name='post_detail'),
 
     #게시글 수정 페이지
-     path('<int:board_id>/<int:post_id>/edit/', views.edit_post, name='post_edit'),
+    path('<int:board_id>/<int:post_id>/edit/', views.edit_post, name='post_edit'),
+
+    #게시글 삭제 페이지
+    path('<int:board_id>/<int:post_id>/delete/', views.delete_post, name='post_delete'),
+
+
 
 ]
