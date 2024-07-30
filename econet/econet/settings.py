@@ -17,15 +17,23 @@ pymysql.install_as_MySQLdb()
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+SECRETS_PATH = os.path.join(BASE_DIR, 'econet', 'secrets.json')
 
+try:
+    with open(SECRETS_PATH) as f:
+        secrets = json.load(f)
+except FileNotFoundError:
+    raise Exception(f"Secrets file not found at {SECRETS_PATH}")
 
+SECRET_KEY = secrets.get('SECRET_KEY')
+"""
 secret_file = os.path.join(BASE_DIR, 'secrets.json')  # secrets.json 파일 위치를 명시
 
 with open(secret_file) as f:
     secrets = json.loads(f.read())
 
 def get_secret(setting):
-    """비밀 변수를 가져오거나 명시적 예외를 반환한다."""
+    
     try:
         return secrets[setting]
     except KeyError:
@@ -34,11 +42,11 @@ def get_secret(setting):
 
 
 SECRET_KEY = get_secret("SECRET_KEY")
-
+"""
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['eehnow.pythonanywhere.com']
+ALLOWED_HOSTS = ['*']
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 
