@@ -102,10 +102,10 @@ DATABASES = {
 #    }
     'default': { 
       	'ENGINE': 'django.db.backends.mysql', 
-        'NAME': 'econet', 
-        'USER': 'root', 
-        'PASSWORD': 'econet', 
-        'HOST': '127.0.0.1', 
+        'NAME': 'database-1', 
+        'USER': 'admin', 
+        'PASSWORD': 'econetproject', 
+        'HOST': 'database-1.cdgs2mau2ch1.ap-northeast-2.rds.amazonaws.com', 
         'PORT': '3306' 
      } 
 }
