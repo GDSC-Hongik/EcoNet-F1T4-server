@@ -13,19 +13,27 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import os, json
 import pymysql  
 from pathlib import Path
+from django.core.exceptions import ImproperlyConfigured
 pymysql.install_as_MySQLdb()
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRETS_PATH = os.path.join(BASE_DIR, 'econet', 'secrets.json')
 
-try:
-    with open(SECRETS_PATH) as f:
-        secrets = json.load(f)
-except FileNotFoundError:
-    raise Exception(f"Secrets file not found at {SECRETS_PATH}")
 
-SECRET_KEY = secrets.get('SECRET_KEY')
+secret_file = os.path.join(BASE_DIR, 'secrets.json')  # secrets.json 파일 위치를 명시
+
+with open(secret_file) as f:
+    secrets = json.loads(f.read())
+
+def get_secret(setting):
+    """비밀 변수를 가져오거나 명시적 예외를 반환한다."""
+    try:
+        return secrets[setting]
+    except KeyError:
+        error_msg = "Set the {} environment variable".format(setting)
+        raise ImproperlyConfigured(error_msg)
+
+
+SECRET_KEY = get_secret("SECRET_KEY")
 """
 secret_file = os.path.join(BASE_DIR, 'secrets.json')  # secrets.json 파일 위치를 명시
 
@@ -102,10 +110,10 @@ DATABASES = {
 #    }
     'default': { 
       	'ENGINE': 'django.db.backends.mysql', 
-        'NAME': 'database-1', 
+        'NAME': 'econet', 
         'USER': 'admin', 
         'PASSWORD': 'econetproject', 
-        'HOST': 'database-1.cdgs2mau2ch1.ap-northeast-2.rds.amazonaws.com', 
+        'HOST': 'database-2.cdgs2mau2ch1.ap-northeast-2.rds.amazonaws.com', 
         'PORT': '3306' 
      } 
 }
