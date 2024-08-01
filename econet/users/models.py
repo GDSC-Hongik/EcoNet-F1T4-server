@@ -45,10 +45,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def has_module_perms(self, app_label):
         return True
 
-    @property
-    def is_staff(self):
-        return self.is_admin
-
     class Meta:
         db_table = 'user'
         permissions = (
