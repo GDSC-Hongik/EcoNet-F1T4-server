@@ -56,7 +56,7 @@ INSTALLED_APPS = [
 	'rest_framework_simplejwt.token_blacklist',
     'users',
     'corsheaders', #CORS 관련 추가
-
+    'boards',
 ]
 
 AUTH_USER_MODEL = 'users.User'
