@@ -5,9 +5,10 @@ from rest_framework_simplejwt.views import TokenVerifyView
 from . import views
 
 urlpatterns = [
-    #로그인과 회원가입
+    #로그인, 회원가입, 로그아웃    
     path('login/', views.login, name='login'),
     path('signup/',  views.signup, name='signup'),
+    path('logout/', views.logout, name='logout'),
 
     #토큰
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

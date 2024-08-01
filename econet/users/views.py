@@ -1,5 +1,6 @@
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
@@ -48,3 +49,18 @@ def login(request):
 
     return Response({'refresh_token': str(refresh),
                      'access_token': str(refresh.access_token), }, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def logout(request):
+    refresh_token = request.data.get('refresh_token')
+    if not refresh_token:
+        return Response({'detail': 'Refresh token is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        token = RefreshToken(refresh_token)
+        token.blacklist()  # 블랙리스트에 추가하여 무효화
+        return Response({'detail': 'Successfully logged out'}, status=status.HTTP_205_RESET_CONTENT)
+    except Exception as e:
+        return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
