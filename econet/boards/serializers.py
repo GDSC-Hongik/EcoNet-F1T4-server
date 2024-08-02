@@ -9,14 +9,14 @@ class CommentSerializer(serializers.ModelSerializer):
 class GatheringSerializer(serializers.ModelSerializer):
     class Meta:
         model = Gathering
-        fields = '__all__'
+        fields = ['subject', 'name', 'activity_scope', 'likes', 'status']
 
 class GatheringDetailSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True)
 
     class Meta:
         model = Gathering
-        fields = '__all__'
+        fields = ['name', 'subject', 'activity_scope', 'status', 'chat_link', 'description', 'comments']
 
 class CommentCreateSerializer(serializers.ModelSerializer):
     class Meta:
@@ -26,9 +26,16 @@ class CommentCreateSerializer(serializers.ModelSerializer):
 class GatheringCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Gathering
-        fields = ['title', 'description', 'date', 'organizer']
+        fields = ['name', 'subject', 'activity_scope', 'status', 'chat_link', 'description', 'location']
+        extra_kwargs = {
+            'name': {'required': True},
+            'subject': {'required': True},
+            'activity_scope': {'required': True},
+            'status': {'required': True},
+            'location': {'required': True},
+        }
 
 class GatheringUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Gathering
-        fields = ['title', 'description', 'date']
+        fields = ['name', 'subject', 'activity_scope', 'status', 'chat_link', 'description', 'location']

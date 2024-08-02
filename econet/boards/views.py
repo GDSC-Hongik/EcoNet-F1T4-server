@@ -15,7 +15,7 @@ def gathering_list_create(request):
             page = int(page)
             limit = int(limit)
         except ValueError:
-            return Response({"error": "Invalid page or limit"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "페이지나 로드 수가 적절하지 않습니다"}, status=status.HTTP_400_BAD_REQUEST)
 
         offset = (page - 1) * limit
         gatherings = Gathering.objects.all()[offset:offset + limit]
@@ -34,7 +34,7 @@ def gathering_detail_update_delete(request, gatheringpost_id):
     try:
         gathering = Gathering.objects.get(id=gatheringpost_id)
     except Gathering.DoesNotExist:
-        return Response({"error": "Gathering not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"error": "모임이 존재하지 않습니다"}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
         serializer = GatheringDetailSerializer(gathering)
@@ -56,7 +56,7 @@ def create_comment(request, gatheringpost_id):
     try:
         gathering = Gathering.objects.get(id=gatheringpost_id)
     except Gathering.DoesNotExist:
-        return Response({"error": "Gathering not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"error": "모임이 존재하지 않습니다"}, status=status.HTTP_404_NOT_FOUND)
 
     serializer = CommentCreateSerializer(data=request.data)
     if serializer.is_valid():
