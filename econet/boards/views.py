@@ -25,7 +25,7 @@ def gathering_list_create(request):
     elif request.method == 'POST':
         serializer = GatheringCreateSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(user_id=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
