@@ -26,14 +26,14 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.BigAutoField(primary_key=True)
     last_login = models.DateTimeField(blank=True, null=True)
-    is_superuser = models.IntegerField()
+    is_superuser = models.IntegerField(default=0)
     email = models.CharField(unique=True, max_length=100)
     password = models.CharField(max_length=128)
     nickname = models.CharField(max_length=100)
     introduction = models.CharField(max_length=200, blank=True, null=True)
     image = models.TextField(blank=True, null=True)
-    is_active = models.IntegerField()
-    is_staff = models.IntegerField()
+    is_active = models.IntegerField(default=1)
+    is_staff = models.IntegerField(default=0)
 
     objects = UserManager()
 
