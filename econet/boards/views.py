@@ -1,4 +1,5 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from datetime import datetime
@@ -23,6 +24,9 @@ def gathering_list_create(request):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     elif request.method == 'POST':
+        if not request.user.is_authenticated:
+            return Response({"error": "먼저 사용자 인증이 필요합니다!"}, status=status.HTTP_401_UNAUTHORIZED)
+
         serializer = GatheringCreateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user_id=request.user)
