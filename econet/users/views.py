@@ -61,6 +61,6 @@ def logout(request):
     try:
         token = RefreshToken(refresh_token)
         token.blacklist()  # 블랙리스트에 추가하여 무효화
-        return Response({'detail': 'Successfully logged out'}, status=status.HTTP_205_RESET_CONTENT)
+        return Response({'detail': 'Successfully logged out'}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
