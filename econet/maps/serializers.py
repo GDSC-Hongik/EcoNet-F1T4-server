@@ -7,16 +7,22 @@ class MapoDistrictSerializer(serializers.ModelSerializer):
         fields = ['district']
 
 class PictureSerializer(serializers.ModelSerializer):
+    picture = serializers.ImageField(use_url=True)
     class Meta:
         model = Pictures
-        fields = ['picture_id', 'picture']
+        fields = ['picture_id', 'picture', 'user','bin']
+
+        read_only_fields = ['picture', 'user', 'bin']
+
+    def validate_picture(self, value):
+        if not value:
+            raise serializers.ValidationError("Picture file is required.")
+        return value
 
 class InformationSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField()  
-
     class Meta:
         model = Information
-        fields = ['info_id', 'content', 'user']
+        fields = ['info_id', 'content', 'user', 'bin']
 
 class BinSerializer(serializers.ModelSerializer):
     first_picture = serializers.SerializerMethodField()
