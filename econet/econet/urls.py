@@ -23,4 +23,5 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('boards/', include('boards.urls')),
     path('todays/', include('todays.urls')),
+    path('maps/', include('maps.urls')),
 ]
