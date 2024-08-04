@@ -1,6 +1,6 @@
-from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
@@ -12,27 +12,9 @@ from django.contrib.auth.models import update_last_login
 from users.serializers import UserSerializer
 
 
-
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def signup(request):
-    """
-    email = request.data.get('email')
-    nickname = request.data.get('nickname')
-    password = request.data.get('password')
-    
-
-    serializer = UserSerializer(data=request.data)
-    serializer.email = email
-    serializer.nickname = nickname
-
-    if serializer.is_valid(raise_exception=True):
-        user = serializer.save()
-        user.set_password(password)
-        user.save()
-
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-"""
 
     serializer = UserSerializer(data=request.data)
     
@@ -51,6 +33,7 @@ def signup(request):
     # 유효하지 않은 경우, 에러를 반환합니다.
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login(request):
@@ -66,3 +49,18 @@ def login(request):
 
     return Response({'refresh_token': str(refresh),
                      'access_token': str(refresh.access_token), }, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def logout(request):
+    refresh_token = request.data.get('refresh_token')
+    if not refresh_token:
+        return Response({'detail': 'Refresh token is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        token = RefreshToken(refresh_token)
+        token.blacklist()  # 블랙리스트에 추가하여 무효화
+        return Response({'detail': 'Successfully logged out'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)

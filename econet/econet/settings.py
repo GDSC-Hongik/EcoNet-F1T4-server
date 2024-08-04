@@ -57,6 +57,8 @@ INSTALLED_APPS = [
     'users',
     'corsheaders', #CORS 관련 추가
     'boards',
+    'todays',
+    'rest_framework',
 ]
 
 AUTH_USER_MODEL = 'users.User'

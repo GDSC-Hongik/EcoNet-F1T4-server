@@ -22,4 +22,5 @@ urlpatterns = [
     path("", views.index, name="index"),
     path('users/', include('users.urls')),
     path('boards/', include('boards.urls')),
+    path('todays/', include('todays.urls')),
 ]
