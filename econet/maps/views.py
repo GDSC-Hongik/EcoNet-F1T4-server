@@ -1,3 +1,7 @@
+import requests
+from django.http import JsonResponse
+from django.conf import settings
+
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.permissions import IsAuthenticated
@@ -6,21 +10,44 @@ from rest_framework import status
 from .models import Bin, MapoDistrict
 from .serializers import BinSerializer, MapoDistrictSerializer, BinDetailSerializer, PictureSerializer, InformationSerializer
 
+def naver_map_data(request):
+    query = request.GET.get('query', '서울 마포구')  # 'query' 파라미터를 받아옴, 기본값은 '서울 마포구'
+    url = 'https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode'
+
+    headers = {
+        'X-NCP-APIGW-API-KEY-ID': settings.NAVER_MAPS_CLIENT_ID,
+        'X-NCP-APIGW-API-KEY': settings.NAVER_MAPS_CLIENT_SECRET,
+    }
+    
+    params = {
+        'query': query  # 검색할 위치 정보
+    }
+    
+    response = requests.get(url, headers=headers, params=params)
+    
+    if response.status_code == 200:
+        return JsonResponse(response.json())  # 성공 시 API 응답을 반환
+    else:
+        return JsonResponse({'error': 'Failed to fetch data from Naver Maps API'}, status=response.status_code)  # 실패 시 에러 메시지 반환
+
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def bin_list(request):
     if request.method == 'GET':
-        bins = Bin.objects.all()
-        bin_serializer = BinSerializer(bins, many=True)
-        
-        mapo_districts = MapoDistrict.objects.all()  # 모든 MapoDistrict 데이터 가져오기
-        mapo_district_serializer = MapoDistrictSerializer(mapo_districts, many=True)  # 직렬화
-        
-        response_data = {
-            "bins": bin_serializer.data,
-            "mapo_districts": mapo_district_serializer.data 
-        }
-        return Response(response_data)
+        bins = Bin.objects.all()  # 모든 배출함 데이터 가져오기
+        bin_serializer = BinSerializer(bins, many=True)  
+        return Response({"bins": bin_serializer.data})
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def district_list(request):
+    if request.method == 'GET':
+        mapo_districts = MapoDistrict.objects.all()  # 모든 마포구역 데이터 가져오기
+        mapo_district_serializer = MapoDistrictSerializer(mapo_districts, many=True)  
+        return Response({"mapo_districts": mapo_district_serializer.data})
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])

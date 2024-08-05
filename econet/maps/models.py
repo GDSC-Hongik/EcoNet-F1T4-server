@@ -38,11 +38,13 @@ class Information(models.Model):
 class Pictures(models.Model):
     picture_id = models.AutoField(primary_key=True)
     picture = picture = models.ImageField(upload_to='pictures/')
-    bin = models.ForeignKey(Bin, models.DO_NOTHING, null=True)
+    bin = models.ForeignKey(Bin, models.DO_NOTHING, blank=True, null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, models.DO_NOTHING,null=True)
 
-    def __str__(self):
-        return f"Picture {self.picture_id} by {self.user}"
+    class Meta:
+        managed = False
+        db_table = 'Pictures'
+
     
 class Information(models.Model):
     info_id = models.AutoField(primary_key=True)
