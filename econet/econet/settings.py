@@ -9,7 +9,8 @@ https://docs.djangoproject.com/en/2.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
-from datetime import timedelta 
+from datetime import timedelta
+from dotenv import load_dotenv 
 
 import os, json
 import pymysql  
@@ -204,3 +205,8 @@ CORS_ALLOW_HEADERS = (
 "x-csrftoken",
 "x-requested-with",
 )
+
+#네이버지도api
+load_dotenv()
+NAVER_MAPS_CLIENT_ID = os.getenv('NAVER_MAPS_CLIENT_ID')
+NAVER_MAPS_CLIENT_SECRET = os.getenv('NAVER_MAPS_CLIENT_SECRET')
