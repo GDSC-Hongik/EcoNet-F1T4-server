@@ -26,7 +26,7 @@ def gathering_list_create(request):
     elif request.method == 'POST':
         if not request.user.is_authenticated:
             return Response({"error": "먼저 사용자 인증이 필요합니다!"}, status=status.HTTP_401_UNAUTHORIZED)
-        
+
         serializer = GatheringCreateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user_id=request.user)
