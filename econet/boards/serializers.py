@@ -24,7 +24,7 @@ class GatheringDetailSerializer(serializers.ModelSerializer):
 class CommentCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ['author', 'content']
+        fields = ['user_id', 'content']
 
 class GatheringCreateSerializer(serializers.ModelSerializer):
     class Meta:
