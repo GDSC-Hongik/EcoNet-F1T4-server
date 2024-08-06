@@ -1,5 +1,5 @@
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from datetime import datetime
@@ -7,6 +7,7 @@ from .models import Gathering, Comment
 from .serializers import GatheringSerializer, GatheringDetailSerializer, CommentCreateSerializer, GatheringCreateSerializer, GatheringUpdateSerializer
 
 @api_view(['GET', 'POST'])
+@permission_classes([AllowAny])
 def gathering_list_create(request):
     if request.method == 'GET': # 모임 목록 조회
         page = request.query_params.get('page', 1)
@@ -34,6 +35,7 @@ def gathering_list_create(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET', 'PATCH', 'DELETE'])
+@permission_classes([AllowAny])
 def gathering_detail_update_delete(request, gatheringpost_id):
     try:
         gathering = Gathering.objects.get(id=gatheringpost_id)

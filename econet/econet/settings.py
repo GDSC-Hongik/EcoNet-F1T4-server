@@ -75,7 +75,7 @@ REST_FRAMEWORK = {
     ),
 
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',  # 모든 요청에 대해 인증 요청
+        'rest_framework.permissions.AllowAny',  # 모든 요청에 대해 인증 요청
     ),
 }
 
