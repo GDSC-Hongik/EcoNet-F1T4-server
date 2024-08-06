@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'boards',
     'todays',
     'rest_framework',
+    'articles',
 ]
 
 AUTH_USER_MODEL = 'users.User'
