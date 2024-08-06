@@ -74,11 +74,13 @@ def create_picture(request, pk):
     picture = request.FILES.get('picture')
 
     # PictureSerializer 사용
-    serializer = PictureSerializer(data={
+    data = {
         'picture': picture,
-        'user': request.user.id,
+        'user': request.user.id,  # 로그인한 사용자의 ID를 설정합니다.
         'bin': bin_instance.id
-    })
+    }
+
+    serializer = PictureSerializer(data=data)
 
     if serializer.is_valid():
         serializer.save()

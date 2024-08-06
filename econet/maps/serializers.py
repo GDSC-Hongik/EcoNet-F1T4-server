@@ -11,8 +11,7 @@ class PictureSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pictures
         fields = ['picture_id', 'picture', 'user','bin']
-
-        read_only_fields = ['picture', 'user', 'bin']
+        read_only_fields = ['picture_id', 'user', 'bin']
 
     def validate_picture(self, value):
         if not value:
