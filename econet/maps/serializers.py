@@ -12,13 +12,6 @@ class PictureSerializer(serializers.ModelSerializer):
         model = Pictures
         fields = ['picture_id', 'picture', 'user','bin']
 
-        read_only_fields = ['picture', 'user', 'bin']
-
-    def validate_picture(self, value):
-        if not value:
-            raise serializers.ValidationError("Picture file is required.")
-        return value
-
 class InformationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Information
