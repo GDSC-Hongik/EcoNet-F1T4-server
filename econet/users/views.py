@@ -9,7 +9,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
 
-from users.serializers import UserSerializer
+from users.serializers import UserSerializer, UserProfileSerializer
 
 
 @api_view(['POST'])
@@ -48,7 +48,7 @@ def login(request):
     update_last_login(None, user)
 
     return Response({'refresh_token': str(refresh),
-                     'access_token': str(refresh.access_token), }, status=status.HTTP_200_OK)
+                    'access_token': str(refresh.access_token), }, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -61,6 +61,13 @@ def logout(request):
     try:
         token = RefreshToken(refresh_token)
         token.blacklist()  # 블랙리스트에 추가하여 무효화
-        return Response({'detail': 'Successfully logged out'}, status=status.HTTP_205_RESET_CONTENT)
+        return Response({'detail': 'Successfully logged out'}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_profile(request):
+    user = request.user
+    serializer = UserProfileSerializer(user)
+    return Response(serializer.data, status=status.HTTP_200_OK)
