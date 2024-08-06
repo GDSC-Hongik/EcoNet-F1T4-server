@@ -8,7 +8,7 @@ from .serializers import GatheringSerializer, GatheringDetailSerializer, Comment
 
 @api_view(['GET', 'POST'])
 def gathering_list_create(request):
-    if request.method == 'GET':
+    if request.method == 'GET': # 모임 목록 조회
         page = request.query_params.get('page', 1)
         limit = request.query_params.get('limit', 10)
 
@@ -23,7 +23,7 @@ def gathering_list_create(request):
         serializer = GatheringSerializer(gatherings, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    elif request.method == 'POST':
+    elif request.method == 'POST':  # 모임 생성
         if not request.user.is_authenticated:
             return Response({"error": "먼저 사용자 인증이 필요합니다!"}, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -40,23 +40,23 @@ def gathering_detail_update_delete(request, gatheringpost_id):
     except Gathering.DoesNotExist:
         return Response({"error": "모임이 존재하지 않습니다"}, status=status.HTTP_404_NOT_FOUND)
 
-    if request.method == 'GET':
+    if request.method == 'GET': # 모임 상세정보 조회
         serializer = GatheringDetailSerializer(gathering)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    elif request.method == 'PATCH':
+    elif request.method == 'PATCH': # 모임 정보 수정
         serializer = GatheringUpdateSerializer(gathering, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    elif request.method == 'DELETE':
+    elif request.method == 'DELETE':    # 모임 삭제
         gathering.delete()
         return Response({"message": "모임이 삭제되었습니다."}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
-def create_comment(request, gatheringpost_id):
+def create_comment(request, gatheringpost_id):  # 댓글 작성
     try:
         gathering = Gathering.objects.get(id=gatheringpost_id)
     except Gathering.DoesNotExist:
