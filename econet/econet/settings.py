@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'boards',
     'todays',
     'rest_framework',
+    'articles',
     'maps',
 ]
 
