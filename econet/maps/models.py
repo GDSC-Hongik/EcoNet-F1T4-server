@@ -41,6 +41,7 @@ class Pictures(models.Model):
     bin = models.ForeignKey(Bin, models.DO_NOTHING, null=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, models.DO_NOTHING, null=False)
 
+
     class Meta:
         managed = False
         db_table = 'Pictures'
