@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from datetime import datetime
+from datetime import date
 from .models import Gathering, Comment
 from .serializers import GatheringSerializer, GatheringDetailSerializer, CommentCreateSerializer, GatheringCreateSerializer, GatheringUpdateSerializer
 
@@ -64,6 +64,6 @@ def create_comment(request, gatheringpost_id):
 
     serializer = CommentCreateSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save(gathering=gathering, date=datetime.date.today())
+        serializer.save(gathering=gathering, date=date.today())
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

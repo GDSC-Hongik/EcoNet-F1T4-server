@@ -1,6 +1,6 @@
-from django.contrib.auth.models import User
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from .models import BoardsComment, BoardsGathering
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -17,7 +17,22 @@ class UserInfoSerializer(serializers.ModelSerializer):
         model = get_user_model()
         fields = ('id', 'email', 'nickname')
 
+
+
+class BoardsGatheringSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BoardsGathering
+        fields = ('id', 'description')
+
+class BoardsCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BoardsComment
+        fields = ('id', 'content')
+
 class UserProfileSerializer(serializers.ModelSerializer):
+    posts = BoardsGatheringSerializer(many=True, read_only=True, source='user_posts')
+    comments = BoardsCommentSerializer(many=True, read_only=True, source='user_comments')
+
     class Meta:
         model = get_user_model()
-        fields = ('id', 'email', 'nickname', 'image')
+        fields = ('id', 'email', 'nickname', 'image', 'posts', 'comments')
