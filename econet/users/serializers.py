@@ -18,7 +18,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
         fields = ('id', 'email', 'nickname')
 
 
-
+        
 class BoardsGatheringSerializer(serializers.ModelSerializer):
     class Meta:
         model = BoardsGathering
@@ -36,3 +36,4 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ('id', 'email', 'nickname', 'image', 'posts', 'comments')
+
