@@ -39,8 +39,9 @@ def gathering_list_create(request):
 
         serializer = GatheringCreateSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(user_id=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            gathering = serializer.save(user_id=request.user)
+            response_serializer = GatheringDetailSerializer(gathering)
+            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET', 'PATCH', 'DELETE'])
