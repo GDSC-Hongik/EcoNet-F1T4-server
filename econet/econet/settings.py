@@ -9,7 +9,8 @@ https://docs.djangoproject.com/en/2.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
-from datetime import timedelta 
+from datetime import timedelta
+from dotenv import load_dotenv 
 
 import os, json
 import pymysql  
@@ -42,7 +43,6 @@ DEBUG = True
 ALLOWED_HOSTS = ['127.0.0.1' ,'13.124.235.155']
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -56,20 +56,27 @@ INSTALLED_APPS = [
 	'rest_framework_simplejwt.token_blacklist',
     'users',
     'corsheaders', #CORS 관련 추가
-
+    'boards',
+    'todays',
+    'rest_framework',
+    'articles',
+    'maps',
 ]
 
 AUTH_USER_MODEL = 'users.User'
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',  # 인증된 요청인지 확인
-        'rest_framework.permissions.IsAdminUser',  # 관리자만 접근 가능
-        'rest_framework.permissions.AllowAny',  # 누구나 접근 가능
-    ),
-
+    # 'DEFAULT_AUTHENTICATION_CLASSES': (
+    #     'rest_framework.permissions.IsAuthenticated',  # 인증된 요청인지 확인
+    #     'rest_framework.permissions.IsAdminUser',  # 관리자만 접근 가능
+    #     'rest_framework.permissions.AllowAny',  # 누구나 접근 가능
+    # ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',  # JWT를 통한 인증방식 사용
+    ),
+
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',
     ),
 }
 
@@ -172,6 +179,9 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 
 #CORS 관련 추가
@@ -198,3 +208,8 @@ CORS_ALLOW_HEADERS = (
 "x-csrftoken",
 "x-requested-with",
 )
+
+#네이버지도api
+load_dotenv()
+NAVER_MAPS_CLIENT_ID = os.getenv('NAVER_MAPS_CLIENT_ID')
+NAVER_MAPS_CLIENT_SECRET = os.getenv('NAVER_MAPS_CLIENT_SECRET')

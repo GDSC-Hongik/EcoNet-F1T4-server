@@ -9,6 +9,7 @@ urlpatterns = [
     path('login/', views.login, name='login'),
     path('signup/',  views.signup, name='signup'),
     path('logout/', views.logout, name='logout'),
+    path('mypage/', views.user_profile, name='user_profile'),
 
     #토큰
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
