@@ -16,13 +16,22 @@ def gathering_list_create(request):
         try:
             page = int(page)
             limit = int(limit)
+            if page < 1:
+                page = 1
         except ValueError:
             return Response({"error": "페이지나 로드 수가 적절하지 않습니다"}, status=status.HTTP_400_BAD_REQUEST)
 
         offset = (page - 1) * limit
-        gatherings = Gathering.objects.all()[offset:offset + limit]
+        gatherings = Gathering.objects.all()
+        total = gatherings.count()
+        gatherings = gatherings[offset:offset + limit]
         serializer = GatheringSerializer(gatherings, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
+        response_data = {
+            "data": serializer.data,
+            "total": total
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
 
     elif request.method == 'POST':  # 모임 생성
         if not request.user.is_authenticated:
