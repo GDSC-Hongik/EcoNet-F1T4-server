@@ -22,7 +22,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
 class BoardsGatheringSerializer(serializers.ModelSerializer):
     class Meta:
         model = BoardsGathering
-        fields = ('id', 'description')
+        fields = ('id', 'name')
 
 class BoardsCommentSerializer(serializers.ModelSerializer):
     class Meta:
