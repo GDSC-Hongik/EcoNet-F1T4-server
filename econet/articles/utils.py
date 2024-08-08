@@ -4,30 +4,6 @@ from articles.models import Article
 from datetime import datetime
 from django.utils.dateparse import parse_datetime
 
-def crawl_hkbs():
-    url = 'https://www.hkbs.co.kr/'
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-
-    articles = soup.select('div.item.large a')
-
-    for article in articles:
-        title = article.select_one('strong.auto-titles').get_text(strip=True)
-        content = ""  # 기사 내용 추출 추가
-        date_str = datetime.now().strftime('%Y-%m-%d')  # 현재 날짜 사용
-        author = ""  # 작성자 추출 추가
-        article_url = article.get('href')
-        if not article_url.startswith('http'):
-            article_url = url + article_url
-
-        Article.objects.get_or_create(
-            title=title,
-            content=content,
-            date=date_str,
-            author=author,
-            url=article_url
-        )
-
 def crawl_bbc():
     base_url = 'https://www.bbc.com/korean/topics/cnq68kgx3v5t'
     response = requests.get(base_url)
@@ -35,6 +11,8 @@ def crawl_bbc():
 
     # 기사 목록
     articles = soup.find_all('div', class_='bbc-bjn8wh e1v051r10')
+
+    crawled_articles = []
 
     for article in articles:
         try:
@@ -62,18 +40,17 @@ def crawl_bbc():
                 # 날짜 추출
                 date_tag = article_soup.find('time')
                 date = date_tag['datetime'] if date_tag else None
-                date = parse_datetime(date) if date and date.startswith('202') else None
+                date = datetime.fromisoformat(date) if date else None
 
-                # DB에 저장
-                Article.objects.update_or_create(
-                    url=url,
-                    defaults={
-                        'title': title,
-                        'content': content,
-                        'date': date,
-                        'image_url': image_url
-                    }
-                )
+                crawled_articles.append({
+                    'title': title,
+                    'url': url,
+                    'content': content,
+                    'date': date,
+                    'image_url': image_url
+                })
 
         except Exception as e:
             print(f"Error occurred: {e}")
+    
+    return crawled_articles
