@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from articles.models import Article
 from datetime import datetime
+from django.utils.dateparse import parse_datetime
 
 def crawl_hkbs():
     url = 'https://www.hkbs.co.kr/'
@@ -27,38 +28,52 @@ def crawl_hkbs():
             url=article_url
         )
 
-def convert_date_format(date_str):
-    try:
-        # 한국어 날짜 형식 예: '2024년 7월 30일'
-        return datetime.strptime(date_str, '%Y년 %m월 %d일').strftime('%Y-%m-%d')
-    except ValueError:
-        return '1900-01-01'  # 기본값 설정
-
 def crawl_bbc():
-    url = "https://www.bbc.com/korean/topics/cnq68kgx3v5t"
-    response = requests.get(url)
+    base_url = 'https://www.bbc.com/korean/topics/cnq68kgx3v5t'
+    response = requests.get(base_url)
     soup = BeautifulSoup(response.content, 'html.parser')
 
-    articles = soup.find_all('li', class_='bbc-t44f9r')
-    for article in articles:
-        title_element = article.find('h2', class_='bbc-766agx')
-        link_element = article.find('a', href=True)
-        image_element = article.find('img', src=True)
-        time_element = article.find('time', class_='promo-timestamp')
+    # 기사 목록
+    articles = soup.find_all('div', class_='bbc-bjn8wh e1v051r10')
 
-        if title_element and link_element:
-            title = title_element.get_text(strip=True)
-            link = f"https://www.bbc.com{link_element['href']}"
-            date = time_element.get_text(strip=True) if time_element else 'Unknown Date'
+    for article in articles:
+        try:
+            title_tag = article.find('h2', class_='bbc-766agx e47bds20')
+            title = title_tag.get_text(strip=True) if title_tag else 'No Title'
             
-            # 날짜 형식 변환
-            date = convert_date_format(date)
-            
-            if not Article.objects.filter(url=link).exists():
-                Article.objects.create(
-                    title=title,
-                    url=link,
-                    content='',  # 실제로는 크롤링하여 내용을 추가해야 함
-                    date=date,
-                    author='BBC 기자'  # 실제 기자 이름으로 대체해야 함
+            link_tag = title_tag.find('a') if title_tag else None
+            url = link_tag['href'] if link_tag else None
+            url = f'https://www.bbc.com{url}' if url and not url.startswith('http') else url
+
+            # 기사 상세 페이지에서 본문과 이미지를 가져옵니다.
+            if url:
+                article_response = requests.get(url)
+                article_soup = BeautifulSoup(article_response.content, 'html.parser')
+
+                # 본문 추출
+                paragraphs = article_soup.find_all('div', dir='ltr')
+                content = '\n'.join(p.get_text(strip=True) for p in paragraphs)
+                
+                # 이미지 URL 추출
+                image_tag = article_soup.find('img')
+                image_url = image_tag['src'] if image_tag else None
+                image_url = f'https:{image_url}' if image_url else None
+
+                # 날짜 추출
+                date_tag = article_soup.find('time')
+                date = date_tag['datetime'] if date_tag else None
+                date = parse_datetime(date) if date and date.startswith('202') else None
+
+                # DB에 저장
+                Article.objects.update_or_create(
+                    url=url,
+                    defaults={
+                        'title': title,
+                        'content': content,
+                        'date': date,
+                        'image_url': image_url
+                    }
                 )
+
+        except Exception as e:
+            print(f"Error occurred: {e}")

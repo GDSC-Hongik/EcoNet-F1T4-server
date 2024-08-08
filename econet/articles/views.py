@@ -7,33 +7,58 @@ from articles.utils import crawl_hkbs, crawl_bbc
 
 @api_view(['GET'])
 def article_list(request):
-    # 크롤링 수행
-    crawl_hkbs()
+    # Crawl latest articles
     crawl_bbc()
 
-    # 쿼리 파라미터로 페이지 및 한 페이지 당 뉴스 개수 가져오기
-    page = int(request.query_params.get('page', 1))
-    limit = int(request.query_params.get('limit', 10))
+    page = request.query_params.get('page', 1)
+    limit = request.query_params.get('limit', 10)
+    query = request.query_params.get('query', '')
 
-    # 뉴스 목록 조회
+    try:
+        page = int(page)
+        limit = int(limit)
+        if page < 1:
+            page = 1
+    except ValueError:
+        return Response({"error": "페이지나 로드 수가 적절하지 않습니다"}, status=status.HTTP_400_BAD_REQUEST)
+
     offset = (page - 1) * limit
-    articles = Article.objects.all()[offset:offset + limit]
+
+    articles = Article.objects.filter(title__contains=query)[offset:offset + limit]
+    total = Article.objects.filter(title__contains=query).count()
     serializer = ArticleSerializer(articles, many=True)
 
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response({"data": serializer.data, "total": total}, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def search_articles(request):
-    # 크롤링 수행
-    crawl_hkbs()
-    crawl_bbc()
-
     query = request.query_params.get('query', '')
-    page = int(request.query_params.get('page', 1))
-    limit = int(request.query_params.get('limit', 10))
 
-    # 뉴스 검색
-    articles = Article.objects.filter(title__icontains=query)[(page - 1) * limit:page * limit]
+    # 검색어가 있을 경우 필터링
+    if query:
+        articles = Article.objects.filter(title__icontains=query)
+    else:
+        articles = Article.objects.all()
+
+    # 페이지네이션 처리
+    page = request.query_params.get('page', 1)
+    limit = request.query_params.get('limit', 10)
+
+    try:
+        page = int(page)
+        limit = int(limit)
+        if page < 1:
+            page = 1
+    except ValueError:
+        return Response({"error": "페이지나 로드 수가 적절하지 않습니다"}, status=status.HTTP_400_BAD_REQUEST)
+
+    offset = (page - 1) * limit
+    total = articles.count()
+    articles = articles[offset:offset + limit]
     serializer = ArticleSerializer(articles, many=True)
 
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    response_data = {
+        "data": serializer.data,
+        "total": total
+    }
+    return Response(response_data, status=status.HTTP_200_OK)
