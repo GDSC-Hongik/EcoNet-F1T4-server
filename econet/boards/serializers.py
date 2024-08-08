@@ -15,7 +15,7 @@ class GatheringSerializer(serializers.ModelSerializer):
 
 class GatheringDetailSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True)
-    user_id = serializers.ReadOnlyField(source='user_id.username')
+    user_id = serializers.PrimaryKeyRelatedField(source='user_id.id', read_only=True)
 
     class Meta:
         model = Gathering
