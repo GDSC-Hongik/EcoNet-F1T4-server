@@ -35,7 +35,11 @@ def naver_map_data(request):
 @permission_classes([AllowAny])
 def bin_list(request):
     if request.method == 'GET':
-        bins = Bin.objects.all()  # 모든 배출함 데이터 가져오기
+        category = request.GET.get('category', None)  # URL 쿼리 파라미터에서 'category'를 가져옴
+        if category:
+            bins = Bin.objects.filter(category=category)  # category에 따라 필터링
+        else:
+            bins = Bin.objects.all()  # 모든 배출함 데이터 가져오기
         bin_serializer = BinSerializer(bins, many=True)  
         return Response({"bins": bin_serializer.data})
 
