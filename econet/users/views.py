@@ -48,7 +48,8 @@ def login(request):
     update_last_login(None, user)
 
     return Response({'refresh_token': str(refresh),
-                    'access_token': str(refresh.access_token), }, status=status.HTTP_200_OK)
+                     'access_token': str(refresh.access_token),
+                      'email': user.email }, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])

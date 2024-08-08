@@ -102,3 +102,32 @@ class DjangoContentType(models.Model):
         managed = False
         db_table = 'django_content_type'
         unique_together = (('app_label', 'model'),)
+
+
+class BoardsComment(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    content = models.TextField()
+    date = models.DateField()
+    gathering = models.ForeignKey('BoardsGathering', models.DO_NOTHING)
+    user_id = models.ForeignKey('User', models.DO_NOTHING, related_name='user_comments')
+
+    class Meta:
+        managed = False
+        db_table = 'boards_comment'
+
+
+class BoardsGathering(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    subject = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+    activity_scope = models.CharField(max_length=10)
+    location = models.CharField(max_length=100)
+    chat_link = models.CharField(max_length=255)
+    likes = models.PositiveIntegerField()
+    status = models.CharField(max_length=10)
+    user_id = models.ForeignKey('User', models.DO_NOTHING, related_name='user_posts')
+
+    class Meta:
+        managed = False
+        db_table = 'boards_gathering'
