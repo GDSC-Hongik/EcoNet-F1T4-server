@@ -49,10 +49,11 @@ def login(request):
     refresh = RefreshToken.for_user(user)
     update_last_login(None, user)
 
-    return Response({'refresh_token': str(refresh),
-                     'access_token': str(refresh.access_token),
-                      'email': user.email }, status=status.HTTP_200_OK)
-
+    return Response({'id' : user.id,
+                     'email': user.email,
+                     'refresh_token': str(refresh),
+                     'access_token': str(refresh.access_token) }, status=status.HTTP_200_OK)
+  
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
