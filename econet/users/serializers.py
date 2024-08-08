@@ -10,6 +10,11 @@ class UserSerializer(serializers.ModelSerializer):
         model = get_user_model()
         fields = ('id', 'email', 'nickname', 'password')
 
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True, write_only=True)
+    new_password = serializers.CharField(required=True, write_only=True)
+
+
 # 패스워드가 필요없는 다른 테이블에서 사용할 용도
 class UserInfoSerializer(serializers.ModelSerializer):
 
