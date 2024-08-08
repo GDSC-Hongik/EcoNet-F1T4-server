@@ -53,7 +53,7 @@ def login(request):
                      'email': user.email,
                      'refresh_token': str(refresh),
                      'access_token': str(refresh.access_token) }, status=status.HTTP_200_OK)
-
+  
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
