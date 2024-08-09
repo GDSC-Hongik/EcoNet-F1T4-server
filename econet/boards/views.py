@@ -77,6 +77,21 @@ def create_comment(request, gatheringpost_id):  # 댓글 작성
     serializer = CommentCreateSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save(gathering=gathering, date=date.today())
-  
+
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def like_gathering(request, gathering_id):
+    try:
+        gathering = Gathering.objects.get(id=gathering_id)
+    except Gathering.DoesNotExist:
+        return Response({"error": "모임이 존재하지 않습니다"}, status=status.HTTP_404_NOT_FOUND)
+
+    # 좋아요 수 증가
+    gathering.likes += 1
+    gathering.save()
+
+    # 업데이트된 모임 데이터 반환
+    serializer = GatheringSerializer(gathering)
+    return Response(serializer.data, status=status.HTTP_200_OK)
