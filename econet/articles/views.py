@@ -1,25 +1,30 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from articles.models import Article
-from articles.serializers import ArticleSerializer
-from articles.utils import crawl_bbc
+from articles.models import BbcArticle, HkbsArticle
+from articles.serializers import BbcArticleSerializer, HkbsArticleSerializer
+from articles.utils import crawl_bbc, crawl_hkbs
 from django.db.models import Q
 
 @api_view(['GET'])
 def article_list(request):
-    # 기존 데이터 삭제
-    Article.objects.all().delete()
+    # BBC 기사 삭제 및 크롤링
+    BbcArticle.objects.all().delete()
+    bbc_articles_data = crawl_bbc()
+    for article_data in bbc_articles_data:
+        BbcArticle.objects.create(**article_data)
 
-    # 새로운 데이터 크롤링 및 저장
-    articles_data = crawl_bbc()
-    for article_data in articles_data:
-        Article.objects.create(**article_data)
+    # HKBS 기사 삭제 및 크롤링
+    HkbsArticle.objects.all().delete()
+    hkbs_articles_data = crawl_hkbs()
+    for article_data in hkbs_articles_data:
+        HkbsArticle.objects.create(**article_data)
 
-    # 데이터 조회
-    articles = Article.objects.all()
+    # BBC와 HKBS 기사 모두 조회
+    bbc_articles = BbcArticle.objects.all()
+    hkbs_articles = HkbsArticle.objects.all()
 
-    # 페이지네이션 로직
+    # 페이지네이션 로직 (BBC)
     page = request.query_params.get('page', 1)
     limit = request.query_params.get('limit', 10)
 
@@ -32,31 +37,48 @@ def article_list(request):
         return Response({"error": "페이지나 로드 수가 적절하지 않습니다"}, status=status.HTTP_400_BAD_REQUEST)
 
     offset = (page - 1) * limit
-    total = articles.count()
-    articles = articles[offset:offset + limit]
-    serializer = ArticleSerializer(articles, many=True)
+    total_bbc = bbc_articles.count()
+    total_hkbs = hkbs_articles.count()
+
+    bbc_articles = bbc_articles[offset:offset + limit]
+    hkbs_articles = hkbs_articles[offset:offset + limit]
+
+    bbc_serializer = BbcArticleSerializer(bbc_articles, many=True)
+    hkbs_serializer = HkbsArticleSerializer(hkbs_articles, many=True)
 
     response_data = {
-        "data": serializer.data,
-        "total": total
+        "bbc_articles": {
+            "data": bbc_serializer.data,
+            "total": total_bbc
+        },
+        "hkbs_articles": {
+            "data": hkbs_serializer.data,
+            "total": total_hkbs
+        }
     }
+
     return Response(response_data, status=status.HTTP_200_OK)
+
 
 @api_view(['GET'])
 def search_articles(request):
     query = request.query_params.get('query', '')
 
-    # 검색어가 있을 경우 필터링 (제목과 본문에서 검색)
+    # BBC 기사 검색
     if query:
-        articles = Article.objects.filter(Q(title__icontains=query) | Q(content__icontains=query))
+        bbc_articles = BbcArticle.objects.filter(Q(title__icontains=query) | Q(content__icontains=query))
     else:
-        articles = Article.objects.all()
+        bbc_articles = BbcArticle.objects.all()
 
-    total = articles.count()
+    bbc_total = bbc_articles.count()
 
-    # 검색어에 해당하는 기사가 없는 경우 빈 목록 반환
-    if total == 0:
-        return Response({"data": [], "total": 0}, status=status.HTTP_200_OK)
+    # HKBS 기사 검색
+    if query:
+        hkbs_articles = HkbsArticle.objects.filter(Q(title__icontains=query) | Q(content__icontains=query))
+    else:
+        hkbs_articles = HkbsArticle.objects.all()
+
+    hkbs_total = hkbs_articles.count()
 
     # 페이지네이션 처리
     page = request.query_params.get('page', 1)
@@ -71,11 +93,25 @@ def search_articles(request):
         return Response({"error": "페이지나 로드 수가 적절하지 않습니다"}, status=status.HTTP_400_BAD_REQUEST)
 
     offset = (page - 1) * limit
-    articles = articles[offset:offset + limit]
-    serializer = ArticleSerializer(articles, many=True)
 
+    # BBC 기사 페이지네이션
+    bbc_articles = bbc_articles[offset:offset + limit]
+    bbc_serializer = BbcArticleSerializer(bbc_articles, many=True)
+
+    # HKBS 기사 페이지네이션
+    hkbs_articles = hkbs_articles[offset:offset + limit]
+    hkbs_serializer = HkbsArticleSerializer(hkbs_articles, many=True)
+
+    # 반환 데이터
     response_data = {
-        "data": serializer.data,
-        "total": total
+        "bbc_articles": {
+            "data": bbc_serializer.data,
+            "total": bbc_total
+        },
+        "hkbs_articles": {
+            "data": hkbs_serializer.data,
+            "total": hkbs_total
+        }
     }
+
     return Response(response_data, status=status.HTTP_200_OK)

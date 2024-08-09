@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from articles.models import Article
+from .models import BbcArticle, HkbsArticle
 from datetime import datetime
 from django.utils.dateparse import parse_datetime
 
@@ -51,6 +51,84 @@ def crawl_bbc():
                 })
 
         except Exception as e:
-            print(f"Error occurred: {e}")
+            print(f"기사를 불러오는 데 실패했습니다!\n잠시 후에 시도해주세요: {e}")
     
     return crawled_articles
+
+def crawl_hkbs():
+    base_url = "https://www.hkbs.co.kr"
+    url = f"{base_url}/news/articleList.html?sc_section_code=S1N1"
+    response = requests.get(url)
+
+    articles_data = []
+
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.content, 'html.parser')
+        articles = soup.select('.auto-article .item')
+
+        for article in articles:
+            # 제목 추출 및 기본값 설정
+            title_element = article.select_one('.auto-titles')
+            title = title_element.text.strip() if title_element else '제목 없음'
+
+            # 기사 링크 추출 및 전체 URL 생성
+            a_tag = article.find('a')
+            relative_url = a_tag['href'] if a_tag else None
+            full_url = f"{base_url}{relative_url}" if relative_url else None
+
+            # URL이 유효하지 않으면 다음 기사로 넘어감
+            if not full_url:
+                print(f"유효하지 않은 URL: {full_url}")
+                continue
+
+            # 상세 페이지에서 본문 크롤링
+            try:
+                detail_response = requests.get(full_url)
+                detail_response.raise_for_status()  # 요청 실패 시 예외 발생
+                detail_soup = BeautifulSoup(detail_response.content, 'html.parser')
+
+                # 본문 내용 추출 및 기본값 설정
+                content_element = detail_soup.select_one('.article-body')
+                content = content_element.text.strip() if content_element else '본문 없음'
+
+                # 날짜 추출 및 기본값 설정
+                infomation_list = detail_soup.find('ul', class_='infomation')
+                if infomation_list:
+                    date_element = infomation_list.find_all('li')[1]  # 두 번째 <li> 태그에서 날짜 추출
+                    if date_element:
+                        date_text = date_element.get_text(strip=True)
+                        date_str = date_text.split('입력')[-1].strip() if '입력' in date_text else ''
+                        try:
+                            date = datetime.strptime(date_str, "%Y.%m.%d %H:%M")
+                        except ValueError:
+                            date = None
+                    else:
+                        date = None
+                else:
+                    date = None
+
+                # 이미지 URL 추출 및 기본값 설정
+                img_url = ''
+                figure_tag = detail_soup.find('figure', class_='photo-layout')
+                if figure_tag:
+                    img_tag = figure_tag.find('img')
+                    if img_tag:
+                        img_url = img_tag['src']
+
+                # 크롤링한 기사 데이터를 딕셔너리로 저장
+                article_data = {
+                    "title": title,
+                    "content": content,
+                    "url": full_url,
+                    "date": date,
+                    "image_url": img_url,
+                }
+                articles_data.append(article_data)
+
+            except requests.RequestException as e:
+                print(f"상세 페이지 요청 중 오류 발생: {e}")
+
+    else:
+        print(f"기사를 불러오는 데 실패했습니다! 상태 코드: {response.status_code}")
+
+    return articles_data
