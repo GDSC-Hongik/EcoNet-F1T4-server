@@ -1,10 +1,21 @@
 import requests
+import os
+from django.conf import settings
 from bs4 import BeautifulSoup
 from .models import BbcArticle, HkbsArticle
 from datetime import datetime
 from django.utils.dateparse import parse_datetime
 
-DEFAULT_IMAGE_URL = '/static/articles/video_icon.jpg'
+# Base64 문자열을 파일에서 읽어 반환하는 함수
+def load_base64_image(file_path):
+    with open(file_path, 'r') as file:
+        return file.read().strip()
+
+# 파일 경로 설정 (settings.BASE_DIR을 사용하여 경로를 설정)
+BASE64_IMAGE_FILE_PATH = os.path.join(settings.BASE_DIR, 'articles', 'static', 'articles', 'base64_default_image.txt')
+
+# 기본 이미지 Base64 문자열 설정
+DEFAULT_IMAGE_BASE64 = load_base64_image(BASE64_IMAGE_FILE_PATH)
 
 def crawl_bbc():
     base_url = 'https://www.bbc.com/korean/topics/cnq68kgx3v5t'
@@ -89,7 +100,7 @@ def crawl_bbc():
                                 image_url = f'https:{image_url}'
                 
                 if not image_url:
-                    image_url = DEFAULT_IMAGE_URL
+                    image_url = DEFAULT_IMAGE_BASE64
 
                 # 날짜 추출
                 date_tag = article_soup.find('time')
