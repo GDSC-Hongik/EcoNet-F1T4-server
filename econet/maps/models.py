@@ -4,6 +4,8 @@ from django.conf import settings
 
 class MapoDistrict(models.Model):
     district = models.CharField(max_length=45, blank=True, null=True)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
 
     class Meta:
         managed = False
