@@ -1,4 +1,6 @@
 import requests
+import os
+from django.conf import settings
 from bs4 import BeautifulSoup
 from .models import BbcArticle, HkbsArticle
 from datetime import datetime
@@ -88,6 +90,7 @@ def crawl_bbc():
                 
                 if not image_url:
                     image_url = ''
+
 
                 # 날짜 추출
                 date_tag = article_soup.find('time')
