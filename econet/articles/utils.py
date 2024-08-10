@@ -4,6 +4,8 @@ from .models import BbcArticle, HkbsArticle
 from datetime import datetime
 from django.utils.dateparse import parse_datetime
 
+DEFAULT_IMAGE_URL = '/static/articles/video_icon.jpg'
+
 def crawl_bbc():
     base_url = 'https://www.bbc.com/korean/topics/cnq68kgx3v5t'
     response = requests.get(base_url)
@@ -31,25 +33,63 @@ def crawl_bbc():
                 # 본문 추출
                 paragraphs = article_soup.find_all('div', dir='ltr')
                 content = '\n'.join(p.get_text(strip=True) for p in paragraphs)
+
+                # # 이미지 URL 추출
+                # image_url = None
+
+                # # 1. 동영상의 holding_image 처리
+                # holding_image_tag = article_soup.find('img', class_='holding_image')
+                # if holding_image_tag:
+                #     if 'srcset' in holding_image_tag.attrs:
+                #         srcset = holding_image_tag['srcset']
+                #         srcset_list = [item.split() for item in srcset.split(',')]
+                #         # 해상도가 가장 큰 항목을 선택
+                #         image_url = max(srcset_list, key=lambda x: int(x[1][:-1]))[0].strip()
+                #     elif 'src' in holding_image_tag.attrs:
+                #         image_url = holding_image_tag['src']
+                #     if image_url and not image_url.startswith('https:'):
+                #         image_url = f'https:{image_url}'
                 
+                # # 2. 일반 이미지 처리
+                # if not image_url:
+                #     figure_tag = article_soup.find('figure', class_='bbc-1qn0xuy')
+                #     if figure_tag:
+                #         img_tag = figure_tag.find('img')
+                #         if img_tag:
+                #             if 'srcset' in img_tag.attrs:
+                #                 srcset = img_tag['srcset']
+                #                 srcset_list = [item.split() for item in srcset.split(',')]
+                #                 image_url = max(srcset_list, key=lambda x: int(x[1][:-1]))[0].strip()
+                #             elif 'src' in img_tag.attrs:
+                #                 image_url = img_tag['src']
+                #             if image_url and not image_url.startswith('https:'):
+                #                 image_url = f'https:{image_url}'
+
+                # # 3. noscript의 이미지 URL 필터링
+                # if image_url and 'hit.xiti' in image_url:
+                #     image_url = None
+
                 # 이미지 URL 추출
                 image_url = None
-                figure_tag = article_soup.find('figure', class_='bbc-1qn0xuy')
-                if figure_tag:
-                    img_tag = figure_tag.find('img')
-                    if img_tag:
-                        if 'srcset' in img_tag.attrs:
-                            srcset = img_tag['srcset']
-                            # 각 srcset 항목에서 URL과 해상도를 분리
-                            srcset_list = [item.split() for item in srcset.split(',')]
-                            # 해상도가 가장 큰 항목을 선택
-                            image_url = max(srcset_list, key=lambda x: int(x[1][:-1]))[0].strip()
-                        elif 'src' in img_tag.attrs:
-                            # srcset이 없을 경우 기본 src 속성에서 이미지를 가져옴
-                            image_url = img_tag['src']
-                        # Ensure the image URL starts with "https:"
-                        if image_url and not image_url.startswith('https:'):
-                            image_url = f'https:{image_url}'
+
+                # 동영상의 holding_image 처리
+                holding_image_tag = article_soup.find('img', class_='holding_image')
+                if holding_image_tag:
+                    image_url = holding_image_tag.get('src')
+                    if image_url and not image_url.startswith('https:'):
+                        image_url = f'https:{image_url}'
+                else:
+                    # 일반 이미지 처리
+                    figure_tag = article_soup.find('figure', class_='bbc-1qn0xuy')
+                    if figure_tag:
+                        img_tag = figure_tag.find('img')
+                        if img_tag:
+                            image_url = img_tag.get('src')
+                            if image_url and not image_url.startswith('https:'):
+                                image_url = f'https:{image_url}'
+                
+                if not image_url:
+                    image_url = DEFAULT_IMAGE_URL
 
                 # 날짜 추출
                 date_tag = article_soup.find('time')
