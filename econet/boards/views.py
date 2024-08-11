@@ -97,7 +97,7 @@ def like_gathering(request, gathering_id):
 
     # 사용자가 이미 좋아요를 눌렀는지 확인
     if UserLike.objects.filter(user=user, gathering=gathering).exists():
-        return Response({"error": "이미 좋아요를 눌렀습니다"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": "이미 좋아요를 눌렀습니다"}, status=status.HTTP_200_OK)
 
     # 좋아요 추가
     UserLike.objects.create(user=user, gathering=gathering)
