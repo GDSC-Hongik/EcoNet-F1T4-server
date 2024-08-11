@@ -4,7 +4,7 @@ from .models import Bin, MapoDistrict, Information, Pictures
 class MapoDistrictSerializer(serializers.ModelSerializer):
     class Meta:
         model = MapoDistrict
-        fields = ['district']
+        fields = ['id','district', 'latitude', 'longitude']
 
 class PictureSerializer(serializers.ModelSerializer):
     picture = serializers.ImageField(use_url=True)

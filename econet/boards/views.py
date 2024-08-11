@@ -87,7 +87,6 @@ def like_gathering(request, gathering_id):
     # 사용자 인증 확인
     if not request.user.is_authenticated:
         return Response({"error": "로그인이 필요합니다."}, status=status.HTTP_401_UNAUTHORIZED)
-
     try:
         gathering = Gathering.objects.get(id=gathering_id)
     except Gathering.DoesNotExist:
@@ -101,7 +100,7 @@ def like_gathering(request, gathering_id):
 
     # 좋아요 추가
     UserLike.objects.create(user=user, gathering=gathering)
-    
+
     # 좋아요 수 증가
     gathering.likes += 1
     gathering.save()
