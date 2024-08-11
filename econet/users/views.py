@@ -3,13 +3,15 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-
 from rest_framework_simplejwt.tokens import RefreshToken
+
 
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
+from django.contrib.auth.password_validation import validate_password
 
-from users.serializers import UserSerializer, UserProfileSerializer
+from users.serializers import UserSerializer, UserProfileSerializer, ChangePasswordSerializer
+
 
 
 @api_view(['POST'])
@@ -47,10 +49,11 @@ def login(request):
     refresh = RefreshToken.for_user(user)
     update_last_login(None, user)
 
-    return Response({'refresh_token': str(refresh),
-                     'access_token': str(refresh.access_token),
-                      'email': user.email }, status=status.HTTP_200_OK)
-
+    return Response({'id' : user.id,
+                     'email': user.email,
+                     'refresh_token': str(refresh),
+                     'access_token': str(refresh.access_token) }, status=status.HTTP_200_OK)
+  
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -72,3 +75,29 @@ def user_profile(request):
     user = request.user
     serializer = UserProfileSerializer(user)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def change_password(request):
+    user = request.user
+    serializer = ChangePasswordSerializer(data=request.data)
+
+    if serializer.is_valid():
+        old_password = serializer.validated_data['old_password']
+        new_password = serializer.validated_data['new_password']
+
+        if not user.check_password(old_password):
+            return Response({"old_password": "Old password is incorrect."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            validate_password(new_password, user)
+        except Exception as e:
+            return Response({"new_password": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user.set_password(new_password)
+        user.save()
+
+        return Response({"detail": "Password has been changed successfully."}, status=status.HTTP_200_OK)
+    
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
