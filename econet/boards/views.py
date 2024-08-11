@@ -3,7 +3,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from datetime import date
-from .models import Gathering, Comment
+from .models import Gathering, Comment, UserLike
 from .serializers import GatheringSerializer, GatheringDetailSerializer, CommentCreateSerializer, GatheringCreateSerializer, GatheringUpdateSerializer
 
 @api_view(['GET', 'POST'])
@@ -82,11 +82,24 @@ def create_comment(request, gatheringpost_id):  # 댓글 작성
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def like_gathering(request, gathering_id):
+    # 사용자 인증 확인
+    if not request.user.is_authenticated:
+        return Response({"error": "로그인이 필요합니다."}, status=status.HTTP_401_UNAUTHORIZED)
     try:
         gathering = Gathering.objects.get(id=gathering_id)
     except Gathering.DoesNotExist:
         return Response({"error": "모임이 존재하지 않습니다"}, status=status.HTTP_404_NOT_FOUND)
+
+    user = request.user
+
+    # 사용자가 이미 좋아요를 눌렀는지 확인
+    if UserLike.objects.filter(user=user, gathering=gathering).exists():
+        return Response({"error": "이미 좋아요를 눌렀습니다"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # 좋아요 추가
+    UserLike.objects.create(user=user, gathering=gathering)
 
     # 좋아요 수 증가
     gathering.likes += 1
