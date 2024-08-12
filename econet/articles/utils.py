@@ -31,8 +31,10 @@ def crawl_bbc():
                 article_soup = BeautifulSoup(article_response.content, 'html.parser')
 
                 # 본문 추출
-                paragraphs = article_soup.find_all('div', dir='ltr')
-                content = '\n'.join(p.get_text(strip=True) for p in paragraphs)
+                # paragraphs = article_soup.find_all('div', dir='ltr')
+                # content = '\n'.join(p.get_text(strip=True) for p in paragraphs)
+
+                content = ''
 
                 # # 이미지 URL 추출
                 # image_url = None
@@ -143,8 +145,10 @@ def crawl_hkbs():
                 detail_soup = BeautifulSoup(detail_response.content, 'html.parser')
 
                 # 본문 내용 추출 및 기본값 설정
-                content_element = detail_soup.select_one('.article-body')
-                content = content_element.text.strip() if content_element else '본문 없음'
+                # content_element = detail_soup.select_one('.article-body')
+                # content = content_element.text.strip() if content_element else '본문 없음'
+
+                content = ''
 
                 # 날짜 추출 및 기본값 설정
                 infomation_list = detail_soup.find('ul', class_='infomation')
