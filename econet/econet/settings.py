@@ -185,10 +185,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 #CORS 관련 추가
-
-CORS_ORIGIN_WHITELIST = ['http://127.0.0.1:3000'
-,'http://localhost:3000','http://13.124.235.155:3000']
-CORS_ALLOW_ALL_ORIGINS = True #(모든 포트 허용)
+CORS_ALLOWED_ORIGINS = [
+    'http://127.0.0.1:3000',
+    'http://localhost:3000',
+    'http://13.124.235.155:3000',
+    'https://eco-net-f1-t4-web.vercel.app',
+    'http://172.30.1.55:3000',
+]
 
 CORS_ALLOW_METHODS = (
 "DELETE",
